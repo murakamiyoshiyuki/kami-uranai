@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, User, Droplet, HelpCircle, Loader2 } from 'lucide-react';
+import { Calendar, User, Droplet, HelpCircle, Loader2, Sparkles, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useFortuneStore } from '../stores/fortuneStore';
 import { 
   calculateDestinyNumber, 
@@ -121,92 +121,121 @@ export function FortunePage() {
   };
 
   return (
-    <main className="flex-1 py-16 px-4">
+    <main className="flex-1 min-h-screen flex items-center justify-center py-16 px-4">
       <div className="container mx-auto max-w-2xl">
-        <h2 className="text-3xl font-bold text-center text-shrine-navy mb-8">
-          あなたの守護神を診断
-        </h2>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
+          <span className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-gold-primary font-medium mb-4">
+            <Sparkles className="w-4 h-4" />
+            あなたの守護神を見つける
+          </span>
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-white">
+            神様診断
+          </h2>
+        </motion.div>
 
-        {/* プログレスバー */}
-        <div className="mb-8">
-          <div className="flex justify-between mb-2">
-            <span className={`text-sm ${currentStep >= 1 ? 'text-shrine-red' : 'text-gray-400'}`}>
-              基本情報
-            </span>
-            <span className={`text-sm ${currentStep >= 2 ? 'text-shrine-red' : 'text-gray-400'}`}>
-              詳細情報
-            </span>
-            <span className={`text-sm ${currentStep >= 3 ? 'text-shrine-red' : 'text-gray-400'}`}>
-              性格診断
-            </span>
+        {/* Progress bar */}
+        <div className="mb-12 max-w-md mx-auto">
+          <div className="flex justify-between mb-4">
+            {['基本情報', '詳細情報', '性格診断'].map((label, index) => (
+              <motion.span
+                key={index}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className={`text-sm font-medium ${
+                  currentStep > index ? 'text-gold-primary' : 'text-gray-500'
+                }`}
+              >
+                {label}
+              </motion.span>
+            ))}
           </div>
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-shrine-red to-shrine-gold transition-all duration-500"
-              style={{ width: `${(currentStep / 3) * 100}%` }}
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-gold-dark to-gold-light"
+              initial={{ width: 0 }}
+              animate={{ width: `${(currentStep / 3) * 100}%` }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             />
           </div>
         </div>
 
         <AnimatePresence mode="wait">
-          {/* Step 1: 生年月日 */}
+          {/* Step 1: Birth date */}
           {currentStep === 1 && (
             <motion.div
               key="step1"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
-              className="bg-white rounded-2xl shadow-xl p-8"
+              className="glass rounded-3xl p-8 md:p-12"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <Calendar className="w-6 h-6 text-shrine-red" />
-                <h3 className="text-xl font-bold">生年月日を入力してください</h3>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-3 glass rounded-full">
+                  <Calendar className="w-6 h-6 text-gold-primary" />
+                </div>
+                <h3 className="text-2xl font-display font-bold text-white">
+                  生年月日を入力してください
+                </h3>
               </div>
 
               <input
                 type="date"
                 value={fortuneStore.birthDate}
                 onChange={handleDateChange}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-shrine-red focus:outline-none transition-colors"
+                className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:border-gold-primary focus:outline-none transition-all"
                 max={new Date().toISOString().split('T')[0]}
               />
 
-              <div className="flex justify-end mt-8">
+              <div className="flex justify-end mt-10">
                 <button
                   onClick={nextStep}
                   disabled={!fortuneStore.birthDate}
-                  className="px-6 py-3 bg-shrine-red text-white rounded-lg font-semibold hover:bg-shrine-red/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="group relative px-8 py-4 overflow-hidden rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  次へ
+                  <div className="absolute inset-0 bg-gradient-to-r from-gold-dark to-gold-light opacity-90 group-hover:opacity-100 group-disabled:opacity-50 transition-opacity" />
+                  <div className="relative flex items-center gap-2 text-dark-primary font-bold">
+                    <span>次へ</span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </button>
               </div>
             </motion.div>
           )}
 
-          {/* Step 2: 性別・血液型 */}
+          {/* Step 2: Gender & Blood type */}
           {currentStep === 2 && (
             <motion.div
               key="step2"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
-              className="bg-white rounded-2xl shadow-xl p-8"
+              className="glass rounded-3xl p-8 md:p-12"
             >
-              <div className="space-y-6">
+              <div className="space-y-10">
                 <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <User className="w-6 h-6 text-shrine-red" />
-                    <h3 className="text-xl font-bold">性別（任意）</h3>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-3 glass rounded-full">
+                      <User className="w-6 h-6 text-gold-primary" />
+                    </div>
+                    <h3 className="text-2xl font-display font-bold text-white">
+                      性別（任意）
+                    </h3>
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-4">
                     {(['male', 'female', 'other'] as const).map((gender) => (
                       <button
                         key={gender}
                         onClick={() => handleGenderChange(gender)}
-                        className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                        className={`px-6 py-4 rounded-2xl border transition-all ${
                           fortuneStore.gender === gender
-                            ? 'border-shrine-red bg-shrine-red text-white'
-                            : 'border-gray-300 hover:border-shrine-red'
+                            ? 'bg-gold-primary/20 border-gold-primary text-gold-primary'
+                            : 'glass border-white/20 text-gray-300 hover:border-gold-primary/50'
                         }`}
                       >
                         {gender === 'male' ? '男性' : gender === 'female' ? '女性' : 'その他'}
@@ -216,19 +245,23 @@ export function FortunePage() {
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <Droplet className="w-6 h-6 text-shrine-red" />
-                    <h3 className="text-xl font-bold">血液型（任意）</h3>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-3 glass rounded-full">
+                      <Droplet className="w-6 h-6 text-gold-primary" />
+                    </div>
+                    <h3 className="text-2xl font-display font-bold text-white">
+                      血液型（任意）
+                    </h3>
                   </div>
-                  <div className="grid grid-cols-4 gap-3">
+                  <div className="grid grid-cols-4 gap-4">
                     {(['A', 'B', 'O', 'AB'] as const).map((bloodType) => (
                       <button
                         key={bloodType}
                         onClick={() => handleBloodTypeChange(bloodType)}
-                        className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                        className={`px-6 py-4 rounded-2xl border transition-all ${
                           fortuneStore.bloodType === bloodType
-                            ? 'border-shrine-red bg-shrine-red text-white'
-                            : 'border-gray-300 hover:border-shrine-red'
+                            ? 'bg-gold-primary/20 border-gold-primary text-gold-primary'
+                            : 'glass border-white/20 text-gray-300 hover:border-gold-primary/50'
                         }`}
                       >
                         {bloodType}型
@@ -238,77 +271,142 @@ export function FortunePage() {
                 </div>
               </div>
 
-              <div className="flex justify-between mt-8">
+              <div className="flex justify-between mt-12">
                 <button
                   onClick={prevStep}
-                  className="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold hover:border-shrine-red transition-colors"
+                  className="group flex items-center gap-2 px-6 py-3 glass rounded-full hover:bg-white/10 transition-all"
                 >
-                  戻る
+                  <ChevronLeft className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+                  <span className="text-gray-300 group-hover:text-white font-medium transition-colors">戻る</span>
                 </button>
                 <button
                   onClick={nextStep}
-                  className="px-6 py-3 bg-shrine-red text-white rounded-lg font-semibold hover:bg-shrine-red/90 transition-all"
+                  className="group relative px-8 py-4 overflow-hidden rounded-full transition-all"
                 >
-                  次へ
+                  <div className="absolute inset-0 bg-gradient-to-r from-gold-dark to-gold-light opacity-90 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative flex items-center gap-2 text-dark-primary font-bold">
+                    <span>次へ</span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </button>
               </div>
             </motion.div>
           )}
 
-          {/* Step 3: 性格診断 */}
+          {/* Step 3: Personality questions */}
           {currentStep === 3 && !isCalculating && (
             <motion.div
               key="step3"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
-              className="bg-white rounded-2xl shadow-xl p-8"
+              className="glass rounded-3xl p-8 md:p-12"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <HelpCircle className="w-6 h-6 text-shrine-red" />
-                <h3 className="text-xl font-bold">質問 {currentQuestionIndex + 1} / {questions.length}</h3>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-3 glass rounded-full">
+                  <HelpCircle className="w-6 h-6 text-gold-primary" />
+                </div>
+                <h3 className="text-2xl font-display font-bold text-white">
+                  質問 {currentQuestionIndex + 1} / {questions.length}
+                </h3>
               </div>
 
-              <p className="text-lg mb-6">{questions[currentQuestionIndex].question}</p>
+              <motion.p
+                key={currentQuestionIndex}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-xl text-gray-200 mb-10"
+              >
+                {questions[currentQuestionIndex].question}
+              </motion.p>
 
-              <div className="space-y-3">
-                {questions[currentQuestionIndex].options.map((option) => (
-                  <button
+              <div className="space-y-4">
+                {questions[currentQuestionIndex].options.map((option, index) => (
+                  <motion.button
                     key={option.value}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
                     onClick={() => handleAnswer(option.value)}
-                    className="w-full text-left px-6 py-4 border-2 border-gray-300 rounded-lg hover:border-shrine-red hover:bg-shrine-red/5 transition-all"
+                    className="w-full text-left px-6 py-5 glass rounded-2xl hover:bg-white/10 border border-white/10 hover:border-gold-primary/50 transition-all group"
                   >
-                    {option.label}
-                  </button>
+                    <span className="text-gray-200 group-hover:text-white transition-colors">
+                      {option.label}
+                    </span>
+                  </motion.button>
                 ))}
               </div>
 
               {currentQuestionIndex > 0 && (
-                <div className="flex justify-start mt-8">
+                <div className="flex justify-start mt-10">
                   <button
                     onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)}
-                    className="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold hover:border-shrine-red transition-colors"
+                    className="group flex items-center gap-2 px-6 py-3 glass rounded-full hover:bg-white/10 transition-all"
                   >
-                    前の質問へ
+                    <ChevronLeft className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+                    <span className="text-gray-300 group-hover:text-white font-medium transition-colors">前の質問へ</span>
                   </button>
                 </div>
               )}
             </motion.div>
           )}
 
-          {/* 診断中 */}
+          {/* Calculating */}
           {isCalculating && (
             <motion.div
               key="calculating"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-2xl shadow-xl p-16 text-center"
+              className="glass rounded-3xl p-16 text-center"
             >
-              <Loader2 className="w-16 h-16 mx-auto mb-6 text-shrine-red animate-spin" />
-              <h3 className="text-2xl font-bold mb-4">診断中...</h3>
-              <p className="text-gray-600">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="inline-block mb-8"
+              >
+                <div className="relative">
+                  <Loader2 className="w-20 h-20 text-gold-primary" />
+                  <div className="absolute inset-0 w-20 h-20 bg-gold-primary/20 blur-xl animate-pulse" />
+                </div>
+              </motion.div>
+              
+              <h3 className="text-3xl font-display font-bold text-white mb-4">
+                診断中...
+              </h3>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-gray-300 text-lg"
+              >
                 高天原の神々があなたの守護神を探しています
-              </p>
+              </motion.p>
+              
+              {/* Floating particles */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                {[...Array(10)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{
+                      x: Math.random() * 100 - 50,
+                      y: 100,
+                      opacity: 0,
+                    }}
+                    animate={{
+                      y: -100,
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      delay: i * 0.3,
+                      ease: "easeOut",
+                    }}
+                    className="absolute bottom-0 left-1/2 w-1 h-1 bg-gold-primary rounded-full"
+                    style={{ left: `${50 + (Math.random() - 0.5) * 80}%` }}
+                  />
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
