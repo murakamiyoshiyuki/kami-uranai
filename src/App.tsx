@@ -6,7 +6,7 @@ import { ResultPage } from './pages/ResultPage';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/kami-uranai">
       <div className="min-h-screen flex flex-col">
         <Header />
         <Routes>
